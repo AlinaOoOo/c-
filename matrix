@@ -1,0 +1,72 @@
+#include <iostream>
+
+using namespace std;
+
+int main() {
+    int n;
+
+    cout << "Введите размерность: ";
+    cin >> n;
+
+    double** A = new double*[n];
+    for (int i = 0; i < n; i++) {
+        A[i] = new double[n];
+    }
+    double* b = new double[n];
+    double* x = new double[n];
+
+    cout << "Введите матрицу коэффициентов" << endl;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cin >> A[i][j];
+        }
+    }
+
+    cout << "Введите вектор" << endl;
+    for (int i = 0; i < n; i++) {
+        cin >> b[i];
+    }
+
+    cout << "\nИсходная система:" << endl;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cout << A[i][j] << " ";
+        }
+        cout << " | " << b[i] << endl;
+    }
+    cout << endl;
+
+    for (int k = 0; k < n - 1; k++) {
+        for (int i = k + 1; i < n; i++) {
+            double t = A[i][k] / A[k][k];
+            b[i] = b[i] - t * b[k];
+            for (int j = k + 1; j < n; j++) {
+                A[i][j] = A[i][j] - t * A[k][j];
+            }
+            A[i][k] = 0;
+        }
+    }
+
+    x[n-1] = b[n-1] / A[n-1][n-1];
+    for (int k = n - 2; k >= 0; k--) {
+        double sum = 0;
+        for (int j = k + 1; j < n; j++) {
+            sum += A[k][j] * x[j];
+        }
+        x[k] = (b[k] - sum) / A[k][k];
+    }
+
+    cout << "Решение:" << endl;
+    for (int i = 0; i < n; i++) {
+        cout<< i + 1<< endl;
+    }
+
+    for (int i = 0; i < n; i++) {
+        delete[] A[i];
+    }
+    delete[] A;
+    delete[] b;
+    delete[] x;
+    
+    return 0;
+}
