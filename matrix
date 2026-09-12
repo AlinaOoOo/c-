@@ -1,14 +1,15 @@
 #include <iostream>
+#include<fstream>
 
 using namespace std;
 
 int main() {
     int n;
-
+    setlocale(LC_ALL, "russian");
     cout << "Введите размерность: ";
     cin >> n;
 
-    double** A = new double*[n];
+    double** A = new double* [n];
     for (int i = 0; i < n; i++) {
         A[i] = new double[n];
     }
@@ -27,6 +28,11 @@ int main() {
         cin >> b[i];
     }
 
+    ofstream fout("result.txt");
+    if (!fout.is_open()) {
+        cout << "ошибка";
+        return 1;
+    }
     cout << "\nИсходная система:" << endl;
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
@@ -37,6 +43,35 @@ int main() {
     cout << endl;
 
     for (int k = 0; k < n - 1; k++) {
+
+        double max = A[k][k];
+        if (max < 0)
+            max = -max;
+        int m = k;
+        for (int i = k + 1; i < n; i++) {
+            double val = A[i][k];
+            if (val < 0)
+                val = -val;
+            if (val > max) {
+                max = val;
+                m = i;
+            }
+        }
+        if (max == 0) {
+            cout << "ошибка";
+            return 1;
+        }
+        if (m != k) {
+            for (int j = 0; j < n; j++) {
+                double temp = A[k][j];
+                A[k][j] = A[m][j];
+                A[m][j] = temp;
+            }
+            double temp = b[k];
+            b[k] = b[m];
+            b[m] = temp;
+        }
+
         for (int i = k + 1; i < n; i++) {
             double t = A[i][k] / A[k][k];
             b[i] = b[i] - t * b[k];
@@ -47,7 +82,7 @@ int main() {
         }
     }
 
-    x[n-1] = b[n-1] / A[n-1][n-1];
+    x[n - 1] = b[n - 1] / A[n - 1][n - 1];
     for (int k = n - 2; k >= 0; k--) {
         double sum = 0;
         for (int j = k + 1; j < n; j++) {
@@ -58,7 +93,7 @@ int main() {
 
     cout << "Решение:" << endl;
     for (int i = 0; i < n; i++) {
-        cout<< i + 1<< endl;
+        cout << x[i]<< endl;
     }
 
     for (int i = 0; i < n; i++) {
@@ -67,6 +102,6 @@ int main() {
     delete[] A;
     delete[] b;
     delete[] x;
-    
+
     return 0;
 }
