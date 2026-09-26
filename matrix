@@ -1,13 +1,19 @@
 #include <iostream>
-#include<fstream>
+#include <fstream>
 
 using namespace std;
 
 int main() {
     int n;
     setlocale(LC_ALL, "russian");
-    cout << "Введите размерность: ";
-    cin >> n;
+
+    ifstream fin("input.txt");
+    if (!fin.is_open()) {
+        cout << "Ошибка: не удалось открыть input.txt" << endl;
+        return 1;
+    }
+
+    fin >> n;  // читаем размерность
 
     double** A = new double* [n];
     for (int i = 0; i < n; i++) {
@@ -16,32 +22,37 @@ int main() {
     double* b = new double[n];
     double* x = new double[n];
 
-    cout << "Введите матрицу коэффициентов" << endl;
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            cin >> A[i][j];
+            fin >> A[i][j];
         }
     }
 
-    cout << "Введите вектор" << endl;
     for (int i = 0; i < n; i++) {
-        cin >> b[i];
+        fin >> b[i];
     }
+    fin.close();
 
     ofstream fout("result.txt");
     if (!fout.is_open()) {
         cout << "ошибка";
         return 1;
     }
+
     cout << "\nИсходная система:" << endl;
+    fout << "Исходная система:" << endl;
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             cout << A[i][j] << " ";
+            fout << A[i][j] << " ";
         }
         cout << " | " << b[i] << endl;
+        fout << " | " << b[i] << endl;
     }
     cout << endl;
+    fout << endl;
 
+    //прямой ход
     for (int k = 0; k < n - 1; k++) {
 
         double max = A[k][k];
@@ -59,6 +70,8 @@ int main() {
         }
         if (max == 0) {
             cout << "ошибка";
+            fout << "ошибка";
+            fout.close();
             return 1;
         }
         if (m != k) {
@@ -82,6 +95,7 @@ int main() {
         }
     }
 
+
     x[n - 1] = b[n - 1] / A[n - 1][n - 1];
     for (int k = n - 2; k >= 0; k--) {
         double sum = 0;
@@ -92,9 +106,13 @@ int main() {
     }
 
     cout << "Решение:" << endl;
+    fout << "Решение:" << endl;
     for (int i = 0; i < n; i++) {
-        cout << x[i]<< endl;
+        cout << x[i] << endl;
+        fout << x[i] << endl;
     }
+
+    fout.close();
 
     for (int i = 0; i < n; i++) {
         delete[] A[i];
